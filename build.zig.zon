@@ -1,0 +1,18 @@
+.{
+    .name = "emergence",
+    .version = "0.1.0",
+    .dependencies = .{
+        .yazap = .{
+            .url = "https://github.com/prajwalch/yazap/archive/refs/heads/main.zip",
+            .hash = "12204e5a58b533fabc5ba5617552dd1d9b6f50d0807952806ac1e4360f1be55024eb",
+        },
+    },
+
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "src",
+        "LICENSE",
+        "README.md",
+    },
+}

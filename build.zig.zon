@@ -1,6 +1,6 @@
 .{
     .name = "emergence",
-    .version = "0.1.0",
+    .version = "0.1.0-dev",
     .dependencies = .{
         .yazap = .{
             .url = "https://github.com/prajwalch/yazap/archive/refs/heads/main.zip",

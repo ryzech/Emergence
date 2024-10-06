@@ -23,10 +23,14 @@ changes made, like NixOS.
 
 # COMMANDS
 
-## generations
+## gen
 
 Configure and modify generations.
 
 *list*
 	List all generations in output.
+
+## init
+
+Create new configuration, will not overwrite existing.
 

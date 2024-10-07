@@ -10,6 +10,7 @@ const Arg = yazap.Arg;
 
 // Commands
 const init = @import("generations/init.zig");
+const list = @import("generations/list.zig");
 
 // App name used for directories etc.
 pub const name: []const u8 = "emergence/";
@@ -54,6 +55,7 @@ pub fn main() anyerror!void {
     if (matches.subcommandMatches("gen")) |gen_cmd_matches| {
         if (gen_cmd_matches.containsArg("list")) {
             log.info("Listing all generations.", .{});
+            list.listGenerations();
             return;
         }
         return;

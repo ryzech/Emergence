@@ -55,14 +55,14 @@ pub fn main() anyerror!void {
     if (matches.subcommandMatches("gen")) |gen_cmd_matches| {
         if (gen_cmd_matches.containsArg("list")) {
             log.info("Listing all generations.", .{});
-            list.listGenerations();
+            list.listGenerations(allocator);
             return;
         }
         return;
     }
 
     if (matches.subcommandMatches("init")) |_| {
-        init.createConfig();
+        init.createConfig(allocator);
         return;
     }
 }

@@ -4,6 +4,7 @@ const posix = std.posix;
 const fs = std.fs;
 const mem = std.mem;
 const main = @import("../main.zig");
+const folders = @import("known-folders");
 
 const log = @import("log.zig");
 
@@ -32,19 +33,13 @@ pub fn create(allocator: mem.Allocator) bool {
 
 /// Get data directory at $HOME/.local/share
 pub fn getDataDir(allocator: mem.Allocator) []const u8 {
-    if (posix.getenv("HOME")) |home| {
-        // Create path if succeeded
-        const path = fs.path.join(allocator, &[_][]const u8{ home, ".local/share", main.name }) catch |err| {
-            // Failed to get config directory, exit app nothing you can do.
-            log.failure("Failed to get data directory: {any}", .{err});
-            posix.exit(1);
-        };
-
-        // Return path
-        return path;
-    } else {
-        // Failed to get home directory, exit app nothing you can do.
-        log.failure("Failed to get home environment.", .{});
+    const data = folders.getPath(allocator, folders.KnownFolder.data) catch |err| {
+        log.failure("Failed to get data directory: {any}", .{err});
         posix.exit(1);
-    }
+    } orelse "";
+    return fs.path.join(allocator, &[_][]const u8{ data, main.name }) catch |err| {
+        // Failed to get config directory, exit app nothing you can do.
+        log.failure("Failed to append data directory: {any}", .{err});
+        posix.exit(1);
+    };
 }

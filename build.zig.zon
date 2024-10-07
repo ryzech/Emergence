@@ -6,6 +6,10 @@
             .url = "https://github.com/prajwalch/yazap/archive/refs/heads/main.zip",
             .hash = "12204e5a58b533fabc5ba5617552dd1d9b6f50d0807952806ac1e4360f1be55024eb",
         },
+        .@"known-folders" = .{
+            .url = "https://github.com/ziglibs/known-folders/archive/refs/heads/master.zip",
+            .hash = "12205f5e7505c96573f6fc5144592ec38942fb0a326d692f9cddc0c7dd38f9028f29",
+        },
     },
 
     .paths = .{

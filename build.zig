@@ -51,7 +51,8 @@ pub fn build(b: *std.Build) !void {
     const options = b.addOptions();
     options.addOption([]const u8, "version", full_version);
 
-    const yazap = b.dependency("yazap", .{});
+    const yazap = b.dependency("yazap", .{}).module("yazap");
+    const known_folders = b.dependency("known-folders", .{}).module("known-folders");
 
     const emergence = b.addExecutable(.{
         .name = "emergence",
@@ -61,7 +62,8 @@ pub fn build(b: *std.Build) !void {
     });
 
     emergence.root_module.addOptions("build_options", options);
-    emergence.root_module.addImport("yazap", yazap.module("yazap"));
+    emergence.root_module.addImport("yazap", yazap);
+    emergence.root_module.addImport("known-folders", known_folders);
 
     b.installArtifact(emergence);
 

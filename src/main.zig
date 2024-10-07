@@ -8,6 +8,12 @@ const log = @import("utils/log.zig");
 const App = yazap.App;
 const Arg = yazap.Arg;
 
+// Commands
+const init = @import("generations/init.zig");
+
+// App name used for directories etc.
+pub const name: []const u8 = "emergence/";
+
 pub fn main() anyerror!void {
     var app = App.init(allocator, "emergence", "NixOS-Like generations for gentoo based systems.");
     defer app.deinit();
@@ -54,7 +60,7 @@ pub fn main() anyerror!void {
     }
 
     if (matches.subcommandMatches("init")) |_| {
-        log.info("Creating new configuration.", .{});
+        init.createConfig();
         return;
     }
 }

@@ -5,6 +5,29 @@ const posix = std.posix;
 
 const log = @import("../utils/log.zig");
 
+pub fn getDirectoryCount(path: []const u8) usize {
+    var dir = fs.cwd().openDir(path, .{
+        .iterate = true,
+    }) catch |err| {
+        log.failure("Failed to open directory: {any}", .{err});
+        posix.exit(1);
+    };
+    defer dir.close();
+
+    var count: usize = 0;
+    var iter = dir.iterate();
+    while (iter.next() catch |err| {
+        log.failure("Failed to search directory: {any}", .{err});
+        posix.exit(1);
+    }) |entry| {
+        if (entry.kind == .directory) {
+            count += 1;
+        }
+    }
+
+    return count;
+}
+
 pub fn getDirectories(allocator: mem.Allocator, path: []const u8) [][]const u8 {
     var dir = fs.cwd().openDir(path, .{
         .iterate = true,

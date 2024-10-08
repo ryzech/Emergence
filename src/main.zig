@@ -57,9 +57,11 @@ pub fn main() anyerror!void {
                 if (create_cmd_matches.containsArg("message")) {
                     const message: []const u8 = create_cmd_matches.getSingleValue("message") orelse "";
                     log.info("Creating with message: {s}", .{message});
+                    gen.create(allocator, message);
                     return;
                 }
                 log.info("Creating", .{});
+                gen.create(allocator, null);
                 return;
             }
             return;

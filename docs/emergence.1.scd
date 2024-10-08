@@ -30,6 +30,13 @@ Configure and modify generations.
 *list*
 	List all generations in output.
 
+*create*
+	Create a new generation.
+
+	*-m*, *--message*
+		Message to be displayed in the list command, should be changes between the
+		last generation and this. If applicable.
+
 ## init
 
 Create new configuration, will not overwrite existing.

@@ -3,6 +3,7 @@ const mem = std.mem;
 
 const log = @import("../utils/log.zig");
 const file = @import("../utils/file.zig");
+const gen = @import("gen.zig");
 const data_dir = @import("../utils/data_dir.zig");
 
 pub fn listGenerations(allocator: mem.Allocator) void {
@@ -11,13 +12,17 @@ pub fn listGenerations(allocator: mem.Allocator) void {
 
     const directories = file.getDirectories(allocator, dir);
     defer {
-        for (directories) |gen| {
-            allocator.free(gen);
+        for (directories) |generation| {
+            allocator.free(generation);
         }
         allocator.free(directories);
     }
 
-    for (directories) |gen| {
-        log.default("- {s}", .{gen});
+    for (directories) |generation| {
+        const gen_data = gen.genFromDir(generation, allocator);
+        log.default("- {s} {s}", .{
+            gen_data.id,
+            gen_data.description,
+        });
     }
 }

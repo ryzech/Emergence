@@ -4,6 +4,7 @@ const posix = std.posix;
 const fs = std.fs;
 const mem = std.mem;
 const main = @import("../main.zig");
+const file = @import("file.zig");
 const folders = @import("known-folders");
 
 const log = @import("log.zig");
@@ -13,21 +14,11 @@ pub fn create(allocator: mem.Allocator) bool {
     // Get the config directory and set the folder name (the name of the app)
     const config_dir = getConfigDir(allocator);
 
-    // Try to make the directory, if exists tell the user
-    fs.makeDirAbsolute(config_dir) catch |err| {
-        if (err == error.PathAlreadyExists) {
-            // Folder already exits, return true but warn that it already exists, and skipped creating.
-            log.warn("The folder already exists, skipping.", .{});
-            return true;
-        }
-
-        // Failed to create, return false
-        log.failure("An error occurred trying to create the folder: {any}", .{err});
-        return false;
-    };
+    // Create the config directory
+    if (!file.createDirectory(config_dir)) return false;
 
     // Created successfully, return true
-    log.success("Created config directory.", .{});
+    log.info("Created config directory.", .{});
     return true;
 }
 

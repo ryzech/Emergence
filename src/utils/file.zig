@@ -43,3 +43,24 @@ pub fn getDirectories(allocator: mem.Allocator, path: []const u8) [][]const u8 {
         posix.exit(1);
     };
 }
+
+pub fn createDirectory(path: []const u8) bool {
+    // Try to make the directory, if exists tell the user
+    fs.makeDirAbsolute(path) catch |err| {
+        if (err == error.PathAlreadyExists) {
+            // Folder already exits, return true but warn that it already exists, and skipped creating.
+            log.warn("The folder already exists, skipping.", .{});
+            return true;
+        }
+
+        // Failed to create, return false
+        log.failure(
+            "An error occurred trying to create the folder: {any}",
+            .{err},
+        );
+        return false;
+    };
+
+    log.info("Created directory at \"{s}\"", .{path});
+    return true;
+}

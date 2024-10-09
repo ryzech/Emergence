@@ -60,6 +60,7 @@ pub fn main() anyerror!void {
                     gen.create(allocator, message);
                     return;
                 }
+                log.warn("No message specified, this won't cause any issues but it's a good idea to document changes.", .{});
                 log.info("Creating", .{});
                 gen.create(allocator, null);
                 return;
@@ -71,7 +72,7 @@ pub fn main() anyerror!void {
     // Init command
     {
         if (matches.containsArg("init")) {
-            init.createConfig(allocator);
+            init.init(allocator);
             return;
         }
     }

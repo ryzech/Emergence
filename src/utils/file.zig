@@ -87,3 +87,10 @@ pub fn createDirectory(path: []const u8) bool {
     log.info("Created directory at \"{s}\"", .{path});
     return true;
 }
+
+pub fn joinPaths(path: []const u8, append: []const u8, allocator: mem.Allocator) []const u8 {
+    return fs.path.join(allocator, &[_][]const u8{ path, append }) catch |err| {
+        log.failure("Failed to append path: {any}", .{err});
+        posix.exit(1);
+    };
+}

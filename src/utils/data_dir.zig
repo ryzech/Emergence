@@ -28,9 +28,5 @@ pub fn getDataDir(allocator: mem.Allocator) []const u8 {
         log.failure("Failed to get data directory: {any}", .{err});
         posix.exit(1);
     } orelse "";
-    return fs.path.join(allocator, &[_][]const u8{ data, main.name }) catch |err| {
-        // Failed to get config directory, exit app nothing you can do.
-        log.failure("Failed to append data directory: {any}", .{err});
-        posix.exit(1);
-    };
+    return file.joinPaths(data, main.name, allocator);
 }

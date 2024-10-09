@@ -23,14 +23,10 @@ pub fn create(allocator: mem.Allocator) bool {
 }
 
 /// Get $XDG_CONFIG_HOME or else default to $HOME/.config
-fn getConfigDir(allocator: mem.Allocator) []const u8 {
+pub fn getConfigDir(allocator: mem.Allocator) []const u8 {
     const config = folders.getPath(allocator, folders.KnownFolder.local_configuration) catch |err| {
         log.failure("Failed to get config directory: {any}", .{err});
         posix.exit(1);
     } orelse "";
-    return fs.path.join(allocator, &[_][]const u8{ config, main.name }) catch |err| {
-        // Failed to get config directory, exit app nothing you can do.
-        log.failure("Failed to append config directory: {any}", .{err});
-        posix.exit(1);
-    };
+    return file.joinPaths(config, main.name, allocator);
 }

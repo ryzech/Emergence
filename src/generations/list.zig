@@ -18,7 +18,6 @@ pub fn listGenerations(allocator: mem.Allocator) void {
         allocator.free(directories);
     }
 
-    log.info("Total generations: {any}", .{file.getDirectoryCount(dir)});
     for (directories) |generation| {
         const gen_data = gen.genFromDir(generation, allocator);
         log.default("- {d} {s}", .{
@@ -26,4 +25,5 @@ pub fn listGenerations(allocator: mem.Allocator) void {
             gen_data.description,
         });
     }
+    log.info("Total generations: {any}", .{file.getDirectoryCount(dir)});
 }

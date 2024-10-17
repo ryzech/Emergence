@@ -10,6 +10,10 @@
             .url = "https://github.com/ziglibs/known-folders/archive/refs/heads/master.zip",
             .hash = "12205f5e7505c96573f6fc5144592ec38942fb0a326d692f9cddc0c7dd38f9028f29",
         },
+        .@"zig-yaml" = .{
+            .url = "https://github.com/kubkon/zig-yaml/archive/refs/heads/main.zip",
+            .hash = "12208398e1393f83a39d03f3ef4893607650b6227dc7f1eee3db4d163fbc2c0c37ca",
+        },
     },
 
     .paths = .{

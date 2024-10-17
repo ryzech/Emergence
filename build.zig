@@ -34,7 +34,7 @@ pub fn build(b: *std.Build) !void {
                 .Inherit,
             ) catch break :blk version;
 
-            var it = mem.split(u8, mem.trim(u8, git_describe_long, &std.ascii.whitespace), "-");
+            var it = mem.splitAny(u8, mem.trim(u8, git_describe_long, &std.ascii.whitespace), "-");
             _ = it.next().?; // previous tag
             const commit_count = it.next().?;
             const commit_hash = it.next().?;
@@ -52,6 +52,7 @@ pub fn build(b: *std.Build) !void {
     options.addOption([]const u8, "version", full_version);
 
     const yazap = b.dependency("yazap", .{}).module("yazap");
+    const yaml = b.dependency("zig-yaml", .{}).module("yaml");
     const known_folders = b.dependency("known-folders", .{}).module("known-folders");
 
     const emergence = b.addExecutable(.{
@@ -63,6 +64,7 @@ pub fn build(b: *std.Build) !void {
 
     emergence.root_module.addOptions("build_options", options);
     emergence.root_module.addImport("yazap", yazap);
+    emergence.root_module.addImport("yaml", yaml);
     emergence.root_module.addImport("known-folders", known_folders);
 
     b.installArtifact(emergence);

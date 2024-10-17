@@ -2,6 +2,7 @@ const std = @import("std");
 const mem = std.mem;
 const fs = std.fs;
 const posix = std.posix;
+const math = std.math;
 
 const log = @import("../utils/log.zig");
 
@@ -93,4 +94,25 @@ pub fn joinPaths(path: []const u8, append: []const u8, allocator: mem.Allocator)
         log.failure("Failed to append path: {any}", .{err});
         posix.exit(1);
     };
+}
+
+pub fn readContents(path: []const u8, allocator: mem.Allocator) []const u8 {
+    const file = fs.cwd().openFile(path, .{}) catch |err| {
+        log.failure("Failed to open file: \"{s}\" {any}", .{
+            path,
+            err,
+        });
+        posix.exit(1);
+    };
+    defer file.close();
+
+    const source = file.readToEndAlloc(allocator, math.maxInt(u32)) catch |err| {
+        log.failure("Failed to read file: \"{s}\" {any}", .{
+            path,
+            err,
+        });
+        posix.exit(1);
+    };
+
+    return source;
 }

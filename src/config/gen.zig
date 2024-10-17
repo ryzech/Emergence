@@ -1,44 +1,64 @@
 const std = @import("std");
-const yaml = @import("yaml");
 const mem = std.mem;
-const fs = std.fs;
-const math = std.math;
 const posix = std.posix;
 
 const log = @import("../utils/log.zig");
-const file = @import("../utils/file.zig");
 const config = @import("config.zig");
+const config_dir = @import("../utils/config_dir.zig");
+const file = @import("../utils/file.zig");
 
-pub fn getImports(path: []const u8, allocator: mem.Allocator) std.ArrayList([]const u8) {
-    var conf = config.loadConfig(path, allocator);
-    defer conf.deinit();
-
-    if (conf.docs.items.len == 0) {
-        log.warn("Empty YAML file: {s}", .{path});
-    }
-
-    var imports = std.ArrayList([]const u8).init(allocator);
-    errdefer {
-        for (imports.items) |item| {
+pub fn getImports(hostname: []const u8, path: []const u8, allocator: mem.Allocator) [][]const u8 {
+    var import_list = std.ArrayList([]const u8).init(allocator);
+    defer {
+        for (import_list.items) |item| {
             allocator.free(item);
         }
-        imports.deinit();
+        import_list.deinit();
     }
 
-    if (conf.docs.items[0].map.get("import")) |import| {
-        for (import.list) |import_path| {
-            const duped_path = allocator.dupe(u8, import_path.string) catch |err| {
-                log.failure("Failed to duplicate import: {any}", .{err});
-                continue;
-            };
+    parseImports(hostname, path, &import_list, allocator);
 
-            imports.append(duped_path) catch |err| {
-                log.failure("Failed to append import to list: {any}", .{err});
-                allocator.free(duped_path);
-                continue;
-            };
-        }
+    return import_list.toOwnedSlice() catch |err| {
+        log.failure("Failed to convert list: {any}", .{err});
+        posix.exit(1);
+    };
+}
+
+fn parseImports(hostname: []const u8, path: []const u8, list: *std.ArrayList([]const u8), allocator: mem.Allocator) void {
+    const config_path = config_dir.getConfigDir(allocator);
+    const host_path = file.joinPaths(config_path, "hosts", allocator);
+    const host_name_path = file.joinPaths(
+        host_path,
+        hostname,
+        allocator,
+    );
+    const full_path = file.joinPaths(host_name_path, path, allocator);
+
+    var imported_file = config.loadConfig(full_path, allocator);
+    defer imported_file.deinit();
+
+    if (imported_file.docs.items.len == 0) {
+        return;
     }
 
-    return imports;
+    const map = imported_file.docs.items[0].map;
+    const imports_node = map.get("import") orelse return;
+
+    list.append(allocator.dupe(u8, path) catch |err| {
+        log.failure("Failed to duplicate the path: {any}", .{err});
+        posix.exit(1);
+    }) catch |err| {
+        log.failure("Failed to append import to list: {any}", .{err});
+        posix.exit(1);
+    };
+
+    if (imports_node.list.len == 0) {
+        return;
+    }
+
+    const imports = imports_node.list;
+
+    for (imports) |import_path| {
+        parseImports(hostname, import_path.string, list, allocator);
+    }
 }

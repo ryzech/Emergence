@@ -89,6 +89,37 @@ pub fn createDirectory(path: []const u8) bool {
     return true;
 }
 
+pub fn createFile(path: []const u8, contents: []const u8) bool {
+    // Create a new file
+    const file = fs.cwd().createFile(
+        path,
+        .{ .read = true, .truncate = true, .exclusive = true },
+    ) catch |err| {
+        if (err == error.PathAlreadyExists) {
+            // File already exits, return true but warn that it already exists, and skipped creating.
+            log.warn("The file already exists, skipping.", .{});
+            return true;
+        }
+
+        // Failed to create, return false
+        log.failure(
+            "An error occurred trying to create the file: {any}",
+            .{err},
+        );
+        return false;
+    };
+    defer file.close();
+
+    // Write the contents to the new file
+    file.writeAll(contents) catch |err| {
+        log.failure("Failed to write to the file! {any}", .{err});
+        return false;
+    };
+
+    log.info("Created file at \"{s}\"", .{path});
+    return true;
+}
+
 pub fn joinPaths(path: []const u8, append: []const u8, allocator: mem.Allocator) []const u8 {
     return fs.path.join(allocator, &[_][]const u8{ path, append }) catch |err| {
         log.failure("Failed to append path: {any}", .{err});

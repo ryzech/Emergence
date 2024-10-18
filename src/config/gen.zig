@@ -5,6 +5,7 @@ const posix = std.posix;
 const log = @import("../utils/log.zig");
 const config = @import("config.zig");
 const config_dir = @import("../utils/config_dir.zig");
+const toml = @import("toml");
 const file = @import("../utils/file.zig");
 
 pub fn getImports(hostname: []const u8, path: []const u8, allocator: mem.Allocator) [][]const u8 {
@@ -34,15 +35,26 @@ fn parseImports(hostname: []const u8, path: []const u8, list: *std.ArrayList([]c
     );
     const full_path = file.joinPaths(host_name_path, path, allocator);
 
-    var imported_file = config.loadConfig(full_path, allocator);
-    defer imported_file.deinit();
+    var parser = toml.Parser(config.GenerationConfig).init(allocator);
+    defer parser.deinit();
 
-    if (imported_file.docs.items.len == 0) {
-        return;
-    }
+    var result = parser.parseFile(full_path) catch |err| {
+        switch (err) {
+            error.CannotParseValue => {
+                return;
+            },
+            else => {
+                log.failure("Failed to parse file: \"{s}\" {any}", .{
+                    full_path,
+                    err,
+                });
+                posix.exit(1);
+            },
+        }
+    };
+    defer result.deinit();
 
-    const map = imported_file.docs.items[0].map;
-    const imports_node = map.get("import") orelse return;
+    const gen_config = result.value;
 
     list.append(allocator.dupe(u8, path) catch |err| {
         log.failure("Failed to duplicate the path: {any}", .{err});
@@ -52,13 +64,11 @@ fn parseImports(hostname: []const u8, path: []const u8, list: *std.ArrayList([]c
         posix.exit(1);
     };
 
-    if (imports_node.list.len == 0) {
+    if (gen_config.imports.len == 0) {
         return;
     }
 
-    const imports = imports_node.list;
-
-    for (imports) |import_path| {
-        parseImports(hostname, import_path.string, list, allocator);
+    for (gen_config.imports) |import_path| {
+        parseImports(hostname, import_path, list, allocator);
     }
 }

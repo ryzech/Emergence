@@ -16,40 +16,38 @@ pub const Generation = struct {
 };
 
 pub fn genFromDir(dir: []const u8, allocator: mem.Allocator) Generation {
-    _ = allocator;
-    //const data_path = data_dir.getDataDir(allocator);
-    //const full_path = fs.path.join(allocator, &[_][]const u8{ data_path, dir }) catch |err| {
-    //    // Failed to get generation directory, exit app nothing you can do.
-    //    log.failure("Failed to append directory: {any}", .{err});
-    //    posix.exit(1);
-    //};
+    const data_path = data_dir.getDataDir(allocator);
+    const full_path = file.joinPaths(data_path, dir, allocator);
+    const info_file = file.joinPaths(full_path, "info", allocator);
+
     const id = numbers.stringToUsize(dir);
+    const desc = file.readContents(info_file, allocator);
 
     const gen: Generation = .{
         .id = id,
         .built = false,
         .selected = false,
-        .description = "test",
+        .description = desc,
     };
 
     return gen;
 }
 
 pub fn create(allocator: mem.Allocator, message: ?[]const u8) void {
-    _ = message;
-    //const desc = message orelse "";
+    const desc = message orelse "";
     const dir = data_dir.getDataDir(allocator);
     const total_generations: usize = file.getDirectoryCount(dir);
 
     const num = total_generations + 1;
     const id = numbers.usizeToString(num, allocator);
-    const full_dir = fs.path.join(allocator, &[_][]const u8{ dir, id }) catch |err| {
-        // Failed to get data directory, exit app nothing you can do.
-        log.failure("Failed to append directory id: {any}", .{err});
-        posix.exit(1);
-    };
+    const full_dir = file.joinPaths(dir, id, allocator);
+    const info_file = file.joinPaths(full_dir, "info", allocator);
 
     if (!file.createDirectory(full_dir)) {
         log.failure("Failed to create new generation: {s}", .{id});
+    }
+
+    if (!file.createFile(info_file, desc)) {
+        log.failure("Failed to create info file for generation {s}", .{id});
     }
 }

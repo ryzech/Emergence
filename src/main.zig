@@ -3,7 +3,9 @@ const mem = std.mem;
 const yazap = @import("yazap");
 const build_options = @import("build_options");
 
-const allocator = std.heap.page_allocator;
+var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+const allocator = gpa.allocator();
+
 const log = @import("utils/log.zig");
 
 const App = yazap.App;
@@ -15,6 +17,8 @@ const gen = @import("generations/gen.zig");
 
 const gen_cmd = @import("commands/gen.zig");
 const init_cmd = @import("commands/init.zig");
+
+const gen_conf = @import("config/gen.zig");
 
 // App name used for directories etc.
 pub const name: []const u8 = "emergence";
@@ -49,6 +53,19 @@ pub fn main() anyerror!void {
             if (gen_cmd_matches.containsArg("list")) {
                 log.info("Listing all generations.", .{});
                 list.listGenerations(allocator);
+
+                const imports = gen_conf.getImports("prometheus", "main.toml", allocator);
+                defer {
+                    for (imports) |import| {
+                        allocator.free(import);
+                    }
+                    allocator.free(imports);
+                }
+
+                for (imports) |import| {
+                    log.info("{s}", .{import});
+                }
+
                 return;
             }
 

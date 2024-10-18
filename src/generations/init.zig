@@ -24,7 +24,7 @@ pub fn createConfig(allocator: mem.Allocator) void {
             os.getHostname(allocator),
             allocator,
         );
-        const host_gen_path = file.joinPaths(host_name_path, "main.yml", allocator);
+        const host_gen_path = file.joinPaths(host_name_path, "main.toml", allocator);
         const systems_path = file.joinPaths(
             config_path,
             "systems",
@@ -38,7 +38,7 @@ pub fn createConfig(allocator: mem.Allocator) void {
         if (!file.createDirectory(host_name_path)) {
             log.warn("Couldn't create hostname path!", .{});
         } else {
-            if (!file.createFile(host_gen_path, @embedFile("../embeds/main.yml"))) {
+            if (!file.createFile(host_gen_path, @embedFile("../embeds/main.toml"))) {
                 log.warn("Couldn't create default generation config!", .{});
             }
         }

@@ -1,0 +1,4 @@
+# Import other files here for better organization
+# paths are all relative, for example "hardware/ssd.toml"
+# or "../common/games.toml"
+import = []

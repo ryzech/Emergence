@@ -68,6 +68,45 @@ pub fn getDirectories(allocator: mem.Allocator, path: []const u8) [][]const u8 {
     };
 }
 
+pub fn getFiles(allocator: mem.Allocator, path: []const u8) [][]const u8 {
+    var dir = fs.cwd().openDir(path, .{
+        .iterate = true,
+    }) catch |err| {
+        log.failure("Failed to open directory: {any}", .{err});
+        posix.exit(1);
+    };
+    defer dir.close();
+
+    var file_list = std.ArrayList([]const u8).init(allocator);
+    defer {
+        for (file_list.items) |item| {
+            allocator.free(item);
+        }
+        file_list.deinit();
+    }
+
+    var iter = dir.iterate();
+    while (iter.next() catch |err| {
+        log.failure("Failed to search directory: {any}", .{err});
+        posix.exit(1);
+    }) |entry| {
+        if (entry.kind == .file) {
+            const name = allocator.dupe(u8, entry.name) catch |err| {
+                log.failure("Couldn't duplicate the file name: {any}", .{err});
+                posix.exit(1);
+            };
+            file_list.append(name) catch |err| {
+                log.failure("Failed to append file name to list: {any}", .{err});
+            };
+        }
+    }
+
+    return file_list.toOwnedSlice() catch |err| {
+        log.failure("Failed to convert list: {any}", .{err});
+        posix.exit(1);
+    };
+}
+
 pub fn createDirectory(path: []const u8) bool {
     // Try to make the directory, if exists tell the user
     fs.makeDirAbsolute(path) catch |err| {

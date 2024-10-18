@@ -52,7 +52,7 @@ pub fn build(b: *std.Build) !void {
     options.addOption([]const u8, "version", full_version);
 
     const yazap = b.dependency("yazap", .{}).module("yazap");
-    const yaml = b.dependency("zig-yaml", .{}).module("yaml");
+    const toml = b.dependency("zig-toml", .{}).module("zig-toml");
     const known_folders = b.dependency("known-folders", .{}).module("known-folders");
 
     const emergence = b.addExecutable(.{
@@ -64,7 +64,7 @@ pub fn build(b: *std.Build) !void {
 
     emergence.root_module.addOptions("build_options", options);
     emergence.root_module.addImport("yazap", yazap);
-    emergence.root_module.addImport("yaml", yaml);
+    emergence.root_module.addImport("toml", toml);
     emergence.root_module.addImport("known-folders", known_folders);
 
     b.installArtifact(emergence);

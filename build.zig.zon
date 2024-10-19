@@ -12,7 +12,7 @@
         },
         .@"zig-toml" = .{
             .url = "https://github.com/sam701/zig-toml/archive/refs/heads/main.zip",
-            .hash = "122078852760edc51542425347595a5425e8a7291f185d4dedaad51da984927e286a",
+            .hash = "1220f8cdd6e1ac72d628dc3bdd4c6965dfea30bfd44cfffb8dfe8bf4898c5defb10a",
         },
     },
 

@@ -13,6 +13,7 @@ pub const SystemPackage = struct {
 
 pub const GenerationConfig = struct {
     imports: [][]const u8,
+    systems: toml.HashMap(SystemPackage),
 };
 
 pub const SystemConfig = struct {

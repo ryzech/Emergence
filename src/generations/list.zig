@@ -19,10 +19,12 @@ pub fn listGenerations(allocator: mem.Allocator) void {
     }
 
     for (directories) |generation| {
-        const gen_data = gen.genFromDir(generation, allocator);
-        log.default("- {d} {s}", .{
+        const gen_data = gen.Generation.fromDir(generation, allocator);
+        log.default("- {d} {s}{s}{s}", .{
             gen_data.id,
             gen_data.description,
+            if (gen_data.selected) "(selected) " else "",
+            if (gen_data.built) "(built) " else "",
         });
     }
     log.info("Total generations: {any}", .{file.getDirectoryCount(dir)});

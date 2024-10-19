@@ -38,7 +38,7 @@ pub fn createConfig(allocator: mem.Allocator) void {
         if (!file.createDirectory(host_name_path)) {
             log.warn("Couldn't create hostname path!", .{});
         } else {
-            if (!file.createFile(host_gen_path, @embedFile("../embeds/main.toml"))) {
+            if (!file.createFile(host_gen_path, @embedFile("../embeds/main.toml"), .{})) {
                 log.warn("Couldn't create default generation config!", .{});
             }
         }

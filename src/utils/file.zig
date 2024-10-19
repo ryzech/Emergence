@@ -128,11 +128,23 @@ pub fn createDirectory(path: []const u8) bool {
     return true;
 }
 
-pub fn createFile(path: []const u8, contents: []const u8) bool {
+pub fn createFile(
+    path: []const u8,
+    contents: []const u8,
+    options: struct {
+        overwrite: bool = false,
+    },
+) bool {
+    const flags = fs.File.CreateFlags{
+        .read = true,
+        .truncate = true,
+        .exclusive = !options.overwrite,
+    };
+
     // Create a new file
     const file = fs.cwd().createFile(
         path,
-        .{ .read = true, .truncate = true, .exclusive = true },
+        flags,
     ) catch |err| {
         if (err == error.PathAlreadyExists) {
             // File already exits, return true but warn that it already exists, and skipped creating.

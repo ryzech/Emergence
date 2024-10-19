@@ -21,12 +21,4 @@ pub fn getSystems(allocator: mem.Allocator) void {
         }
         allocator.free(systems_files);
     }
-
-    for (systems_files) |files| {
-        const system: config.System = config.System.fromFile(files, allocator);
-        log.default("Name: {s} Display Name: {s}", .{
-            system.name,
-            system.display_name,
-        });
-    }
 }

@@ -21,6 +21,9 @@ changes made, like NixOS.
 *-v*, *--version*
 	Print the version number and exit.
 
+*-V* *--verbose*
+	Enable more verbose logging.
+
 # COMMANDS
 
 ## gen
@@ -36,6 +39,12 @@ Configure and modify generations.
 	*-m*, *--message*
 		Message to be displayed in the list command, should be changes between the
 		last generation and this. If applicable.
+
+*select*
+	Set selected generation.
+
+	*id*
+		The id to be selected. If none is given a warning will be output.
 
 ## init
 

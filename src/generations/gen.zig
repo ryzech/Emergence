@@ -36,6 +36,17 @@ pub const Generation = struct {
 
         return gen;
     }
+
+    pub fn select(id: []const u8, allocator: mem.Allocator) void {
+        const data_path = data_dir.getDataDir(allocator);
+        const selected_file = file.joinPaths(data_path, "selected", allocator);
+
+        if (!file.createFile(selected_file, id, .{
+            .overwrite = true,
+        })) {
+            log.failure("Failed to set {s} as selected!", .{id});
+        }
+    }
 };
 
 pub fn create(allocator: mem.Allocator, message: ?[]const u8) void {

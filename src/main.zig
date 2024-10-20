@@ -34,7 +34,8 @@ pub fn main() anyerror!void {
     // Add args and subcommands to the root command
     try emergence.addSubcommand(try gen_cmd.create(allocator, &app));
     try emergence.addSubcommand(try init_cmd.create(allocator, &app));
-    try emergence.addArg(Arg.booleanOption("version", 'v', "Display program version number"));
+    try emergence.addArg(Arg.booleanOption("version", 'v', "Display program version number."));
+    try emergence.addArg(Arg.booleanOption("verbose", 'V', "Enable verbose logging."));
 
     const matches = try app.parseProcess();
 
@@ -72,7 +73,7 @@ pub fn main() anyerror!void {
             // Create command
             if (gen_cmd_matches.subcommandMatches("create")) |create_cmd_matches| {
                 if (create_cmd_matches.containsArg("message")) {
-                    const message: []const u8 = create_cmd_matches.getSingleValue("message") orelse "";
+                    const message = create_cmd_matches.getSingleValue("message") orelse "";
                     log.info("Creating with message: {s}", .{message});
                     gen.create(allocator, message);
                     return;
@@ -80,6 +81,17 @@ pub fn main() anyerror!void {
                 log.warn("No message specified, this won't cause any issues but it's a good idea to document changes.", .{});
                 log.info("Creating", .{});
                 gen.create(allocator, null);
+                return;
+            }
+
+            if (gen_cmd_matches.subcommandMatches("select")) |select_cmd_matches| {
+                if (select_cmd_matches.containsArg("id")) {
+                    const id = select_cmd_matches.getSingleValue("id") orelse "";
+                    gen.Generation.select(id, allocator);
+                    log.success("Set generation {s} as selected.", .{id});
+                    return;
+                }
+                log.warn("No ID given! Please specify an ID.", .{});
                 return;
             }
             return;

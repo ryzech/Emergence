@@ -4,7 +4,7 @@
     .dependencies = .{
         .yazap = .{
             .url = "https://github.com/prajwalch/yazap/archive/refs/heads/main.zip",
-            .hash = "12204e5a58b533fabc5ba5617552dd1d9b6f50d0807952806ac1e4360f1be55024eb",
+            .hash = "122054439ec36ac10987c87ae69f3b041b40b2e451af3fe3ef1fc578b3bad756a800",
         },
         .@"known-folders" = .{
             .url = "https://github.com/ziglibs/known-folders/archive/refs/heads/master.zip",

@@ -47,6 +47,17 @@ pub const Generation = struct {
             log.failure("Failed to set {s} as selected!", .{id});
         }
     }
+
+    pub fn build(id: []const u8, allocator: mem.Allocator) void {
+        const data_path = data_dir.getDataDir(allocator);
+        const built_file = file.joinPaths(data_path, "built", allocator);
+
+        if (!file.createFile(built_file, id, .{
+            .overwrite = true,
+        })) {
+            log.failure("Failed to build {s}!", .{id});
+        }
+    }
 };
 
 pub fn create(allocator: mem.Allocator, message: ?[]const u8) void {
@@ -73,4 +84,10 @@ pub fn create(allocator: mem.Allocator, message: ?[]const u8) void {
     })) {
         log.failure("Failed to set generation {s} as selected!", .{id});
     }
+}
+
+pub fn getSelected(allocator: mem.Allocator) []const u8 {
+    const dir = data_dir.getDataDir(allocator);
+    const selected_file = file.joinPaths(dir, "selected", allocator);
+    return file.readContents(selected_file, allocator);
 }

@@ -64,11 +64,11 @@ fn parseImports(hostname: []const u8, path: []const u8, list: *std.ArrayList([]c
         posix.exit(1);
     };
 
-    if (gen_config.imports.len == 0) {
+    if (gen_config.imports) |import_slice| {
+        for (import_slice) |import_path| {
+            parseImports(hostname, import_path, list, allocator);
+        }
+    } else {
         return;
-    }
-
-    for (gen_config.imports) |import_path| {
-        parseImports(hostname, import_path, list, allocator);
     }
 }

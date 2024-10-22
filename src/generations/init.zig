@@ -6,6 +6,7 @@ const log = @import("../utils/log.zig");
 const os = @import("../utils/os.zig");
 const config_dir = @import("../utils/config_dir.zig");
 const data_dir = @import("../utils/data_dir.zig");
+const paths = @import("../utils/paths.zig");
 const file = @import("../utils/file.zig");
 const main = @import("../main.zig");
 
@@ -17,25 +18,17 @@ pub fn init(allocator: mem.Allocator) void {
 pub fn createConfig(allocator: mem.Allocator) void {
     log.info("Creating config folder...", .{});
     if (config_dir.create(allocator)) {
-        const config_path = config_dir.getConfigDir(allocator);
-        const host_path = file.joinPaths(config_path, "hosts", allocator);
-        const host_name_path = file.joinPaths(
-            host_path,
-            os.getHostname(allocator),
+        const host_gen_path = file.joinPaths(
+            paths.getHostnameDir(os.getHostname(allocator), allocator),
+            "main.toml",
             allocator,
         );
-        const host_gen_path = file.joinPaths(host_name_path, "main.toml", allocator);
-        const systems_path = file.joinPaths(
-            config_path,
-            "systems",
-            allocator,
-        );
-
         // Create the directories for system specific configuration
-        if (!file.createDirectory(host_path)) {
+        if (!file.createDirectory(paths.getHostsDir(allocator))) {
             log.warn("Couldn't create hosts path!", .{});
         }
-        if (!file.createDirectory(host_name_path)) {
+
+        if (!file.createDirectory(paths.getHostnameDir(os.getHostname(allocator), allocator))) {
             log.warn("Couldn't create hostname path!", .{});
         } else {
             if (!file.createFile(host_gen_path, @embedFile("../embeds/main.toml"), .{})) {
@@ -44,7 +37,7 @@ pub fn createConfig(allocator: mem.Allocator) void {
         }
 
         // Create the directory for package manager definitions
-        if (!file.createDirectory(systems_path)) {
+        if (!file.createDirectory(paths.getSystemsDir(allocator))) {
             log.warn("Couldn't create systems path!", .{});
         }
 

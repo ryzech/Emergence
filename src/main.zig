@@ -19,6 +19,7 @@ const gen_cmd = @import("commands/gen.zig");
 const init_cmd = @import("commands/init.zig");
 
 const gen_conf = @import("config/gen.zig");
+const sys_conf = @import("config/systems.zig");
 
 // App name used for directories etc.
 pub const name: []const u8 = "emergence";
@@ -54,19 +55,6 @@ pub fn main() anyerror!void {
             if (gen_cmd_matches.containsArg("list")) {
                 log.info("Listing all generations.", .{});
                 list.listGenerations(allocator);
-
-                const imports = gen_conf.getImports("prometheus", "main.toml", allocator);
-                defer {
-                    for (imports) |import| {
-                        allocator.free(import);
-                    }
-                    allocator.free(imports);
-                }
-
-                for (imports) |import| {
-                    log.info("{s}", .{import});
-                }
-
                 return;
             }
 
@@ -92,6 +80,25 @@ pub fn main() anyerror!void {
                     return;
                 }
                 log.warn("No ID given! Please specify an ID.", .{});
+                return;
+            }
+
+            if (gen_cmd_matches.subcommandMatches("build")) |build_cmd_matches| {
+                if (build_cmd_matches.containsArg("id")) {
+                    const id = build_cmd_matches.getSingleValue("id") orelse "";
+                    log.info("Building generation {s}...", .{id});
+
+                    gen.Generation.build(id, allocator);
+
+                    log.success("Built generation {s}.", .{id});
+                    return;
+                }
+                const id = gen.getSelected(allocator);
+                log.info("Building generation {s}...", .{id});
+
+                gen.Generation.build(id, allocator);
+
+                log.success("Built generation {s}.", .{id});
                 return;
             }
             return;

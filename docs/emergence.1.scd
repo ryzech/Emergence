@@ -46,6 +46,12 @@ Configure and modify generations.
 	*id*
 		The id to be selected. If none is given a warning will be output.
 
+*build*
+	Build selected generation.
+
+	*id*
+		The id to be built. If none is given it will default to the selected one.
+
 ## init
 
 Create new configuration, will not overwrite existing.

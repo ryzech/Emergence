@@ -26,6 +26,14 @@ pub fn create(allocator: mem.Allocator, app: *App) !yazap.Command {
         }
         try cmd_generations.addSubcommand(cmd_generations_select);
 
+        // Build subcommand, build selected generation
+        // or build a specific one.
+        var cmd_generations_build = app.createCommand("build", "Build selected generation.");
+        {
+            try cmd_generations_build.addArg(Arg.positional("id", "Build specific generation, otherwise selected is built.", null));
+        }
+        try cmd_generations.addSubcommand(cmd_generations_build);
+
         // Create subcommand, create a new generation
         var cmd_generations_create = app.createCommand("create", "Create a new generation.");
         {
